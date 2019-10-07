@@ -5,8 +5,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import amata1219.slash.Maybe.Just;
+import amata1219.slash.Maybe.Nothing;
 
-public interface CommandMonad<T> {
+public interface CommandMonad<R> {
 	
 	public static void main(String[] $){
 	}
@@ -26,37 +27,48 @@ public interface CommandMonad<T> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	default <T> Either<E, T> flatMap(Function<R, Either<E, T>> mapper){
+	default <R> Either<E, T> flatMap(Function<R, Either<E, T>> mapper){
 		return this instanceof Error ? ((Error<E, T>) this) : mapper.apply(((Result<E, R>) this).result);
 	}
 	
-	default <T> Either<E, T> map(Function<R, T> mapper){
+	default <R> Either<E, T> map(Function<R, T> mapper){
 		return flatMap(result -> new Result<E, T>(mapper.apply(result)));
 	}
 	 */
 	
-	public static <T> Result<T> Result(T result){
+	public static <R> Result<R> Result(T result){
 		return Result(Maybe.unit(result));
 	}
 	
-	public static <T> Result<T> Result(Maybe<T> result){
+	public static <R> Result<R> Result(Maybe<R> result){
 		return new Result<>(result);
 	}
 	
-	public static <T> Error<T> Error(String error){
+	public static <R> Error<R> Error(String error){
 		return new Error<>(error);
 	}
 	
-	default CommandMonad<T> whenN(String error){
-		return this instanceof Error ? this : ((Result<T>) this).result instanceof Just ? this : Error(error);
+	/*default CommandMonad<R> whenN(String error){
+		return this instanceof Error ? this : ((Result<R>) this).result instanceof Just ? this : Error(error);
 	}
 	
 	@SuppressWarnings("unchecked")
-	default <U> CommandMonad<U> map(Function<T, U> mapper){
-		return this instanceof Error ? ((Error<U>) this) : Result(((Result<T>) this).result.bind(mapper));
+	default <T> CommandMonad<T> flatMap(Function<R, CommandMonad<T>> mapper){
+		if(this instanceof Error) return (Error<T>) this;
+		Maybe<R> maybe = ((Result<R>) this).result;
+		return maybe instanceof Nothing ? (Error<T>) this : mapper.apply(((Just<R>) maybe).value);
 	}
 	
-	class Error<T> implements CommandMonad<T> {
+	@SuppressWarnings("unchecked")
+	default <T> CommandMonad<T> map(Function<R, T> mapper){
+		return flatMap(mapper.andThen(result -> new Result<T>(result)));
+	}*/
+	
+	<T> CommandMonad<T> flatMap(Function<R, CommandMonad<T>> mapper);
+	
+	//<T> CommandMonad<T> map(Function<R, T> mapper);
+	
+	class Error<R> implements CommandMonad<R> {
 		
 		public final String error;
 		
@@ -66,12 +78,18 @@ public interface CommandMonad<T> {
 		
 	}
 	
-	class Result<T> implements CommandMonad<T> {
+	class Result<R> implements CommandMonad<R> {
 		
-		public final Maybe<T> result;
+		public final Maybe<R> result;
 		
-		public Result(Maybe<T> result){
+		public Result(Maybe<R> result){
 			this.result = result;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> CommandMonad<T> flatMap(Function<R, CommandMonad<T>> mapper) {
+			return result instanceof Nothing ? (Result<T>) this : mapper.apply(((Just<R>) result).value);
 		}
 		
 	}

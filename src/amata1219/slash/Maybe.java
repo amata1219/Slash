@@ -30,7 +30,7 @@ public interface Maybe<T> {
 
 	public static class Just<T> implements Maybe<T> {
 
-		private final T value;
+		public final T value;
 
 		public Just(T value){
 			this.value = Objects.requireNonNull(value);
