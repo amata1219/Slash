@@ -1,6 +1,9 @@
 package amata1219.slash;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
+
+import com.google.common.base.Supplier;
 
 import amata1219.slash.Result.Just;
 import amata1219.slash.Result.Nothing;
@@ -23,15 +26,6 @@ public interface CommandMonad<R> {
 	default Either<E, R> when(Predicate<R> predicate, E error){
 		return this instanceof Error ? this : predicate.test(((Result<E, R>) this).result) ? new Error<>(error) : this;
 	}
-	
-	@SuppressWarnings("unchecked")
-	default <R> Either<E, T> flatMap(Function<R, Either<E, T>> mapper){
-		return this instanceof Error ? ((Error<E, T>) this) : mapper.apply(((Result<E, R>) this).result);
-	}
-	
-	default <R> Either<E, T> map(Function<R, T> mapper){
-		return flatMap(result -> new Result<E, T>(mapper.apply(result)));
-	}
 	 */
 	
 	public static <R> Result<R> Result(R result){
@@ -42,29 +36,21 @@ public interface CommandMonad<R> {
 		return new Error<>(error);
 	}
 	
-	/*default CommandMonad<R> whenN(String error){
-		return this instanceof Error ? this : ((Result<R>) this).result instanceof Just ? this : Error(error);
-	}
-	}*/
-	
+	@SuppressWarnings("unchecked")
 	default <T> CommandMonad<T> flatBind(Function<R, CommandMonad<T>> mapper){
-		if(this instanceof Error || this instanceof Nothing) return cast();
-		else return mapper.apply(asJust().value);
+		return this instanceof Error || this instanceof Nothing ? (CommandMonad<T>) this : mapper.apply(((Just<R>) this).value);
 	}
 	
 	default <T> CommandMonad<T> bind(Function<R, T> mapper){
-		return flatBind(res -> Result(mapper.apply(asJust().value)));
+		return flatBind(res -> Result(mapper.apply(((Just<R>) this).value)));
 	}
 	
-	@SuppressWarnings("unchecked")
-	default <T> CommandMonad<T> cast(){
-		if(this instanceof Just) throw new IllegalStateException("Just<R> can not be cast to Just<T>");
-		else return (CommandMonad<T>) this;
+	default CommandMonad<R> when(Predicate<R> predicate, Supplier<String> error){
+		return this instanceof Error || this instanceof Nothing ? this : predicate.test(((Just<R>) this).value) ? Error(error.get()) : this;
 	}
 	
-	default Just<R> asJust(){
-		if(this instanceof Just) return (Just<R>) this;
-		else throw new IllegalStateException("Error and Nothing can not be cast to Just");
+	default CommandMonad<R> otherwise(Predicate<R> predicate, Supplier<String> error){
+		return when(predicate.negate(), error);
 	}
 	
 	class Error<R> implements CommandMonad<R> {

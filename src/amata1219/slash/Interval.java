@@ -34,7 +34,7 @@ public class Interval<N extends Number & Comparable<N>> {
 		return lower.lesser(x) && upper.greater(x);
 	}
 	
-	static class EndPoint<T extends Number & Comparable<T>> {
+	private static class EndPoint<T extends Number & Comparable<T>> {
 		
 		public final T x;
 		public final boolean containsEqualElement;
