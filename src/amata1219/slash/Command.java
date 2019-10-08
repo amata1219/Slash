@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Supplier;
 
-public interface CommandMonad<R> {
+public interface Command<R> {
 	
 	public static void main(String[] $){
 		
@@ -25,20 +25,12 @@ public interface CommandMonad<R> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	default <T> CommandMonad<T> flatBind(Function<R, CommandMonad<T>> mapper){
-		return this instanceof Error ? (CommandMonad<T>) this : mapper.apply(((Result<R>) this).result);
+	default <T> Command<T> flatBind(Function<R, Command<T>> mapper){
+		return this instanceof Error ? (Command<T>) this : mapper.apply(((Result<R>) this).result);
 	}
 	
-	default <T> CommandMonad<T> bind(Function<R, T> mapper){
+	default <T> Command<T> bind(Function<R, T> mapper){
 		return flatBind(res -> Result(mapper.apply(((Result<R>) this).result)));
-	}
-	
-	default CommandMonad<R> when(Predicate<R> predicate, Supplier<String> error){
-		return this instanceof Error ? this : predicate.test(((Result<R>) this).result) ? Error(error.get()) : this;
-	}
-	
-	default CommandMonad<R> otherwise(Predicate<R> predicate, Supplier<String> error){
-		return when(predicate.negate(), error);
 	}
 	
 	default void match(Consumer<String> error, Consumer<R> result){
@@ -46,7 +38,21 @@ public interface CommandMonad<R> {
 		else result.accept(((Result<R>) this).result);
 	}
 	
-	class Error<R> implements CommandMonad<R> {
+	default Command<R> when(Predicate<R> predicate, Supplier<String> error){
+		return this instanceof Error ? this : predicate.test(((Result<R>) this).result) ? Error(error.get()) : this;
+	}
+	
+	default Command<R> otherwise(Predicate<R> predicate, Supplier<String> error){
+		return when(predicate.negate(), error);
+	}
+	
+	default Command<R> match(@SuppressWarnings("unchecked") Matcher<R>... cases){
+		if(this instanceof Error || cases.length == 1) return this;
+		for(Matcher<R> cs : cases) if(cs.match(((Result<R>) this).result)) return cs.evalExpr();
+		return this;
+	}
+	
+	class Error<R> implements Command<R> {
 		
 		public final String error;
 		
@@ -56,7 +62,7 @@ public interface CommandMonad<R> {
 		
 	}
 	
-	class Result<R> implements CommandMonad<R> {
+	class Result<R> implements Command<R> {
 		
 		public final R result;
 		

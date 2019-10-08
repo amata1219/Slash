@@ -2,7 +2,7 @@ package amata1219.slash;
 
 import java.util.Objects;
 
-public interface Maybe<R> extends CommandMonad<R> {
+public interface Maybe<R> extends Command<R> {
 
 	public static <R> Maybe<R> unit(R value){
 		return value != null ? new Just<>(value) : Nothing.instance();
