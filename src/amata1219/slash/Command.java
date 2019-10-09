@@ -1,7 +1,5 @@
 package amata1219.slash;
 
-import static amata1219.slash.Interval.*;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -10,14 +8,8 @@ import com.google.common.base.Supplier;
 
 public interface Command<R> {
 	
-	public static void main(String[] $){
-		
-		Result(100).otherwise(Range(0, 10)::contains, () -> "");
-		
-	}
-	
-	public static <R> Maybe<R> Result(R result){
-		return Maybe.unit(result);
+	public static <R> Result<R> Result(R result){
+		return new Result<>(result);
 	}
 	
 	public static <R> Error<R> Error(String error){
@@ -33,9 +25,14 @@ public interface Command<R> {
 		return flatBind(res -> Result(mapper.apply(((Result<R>) this).result)));
 	}
 	
-	default void match(Consumer<String> error, Consumer<R> result){
-		if(this instanceof Error) error.accept(((Error<R>) this).error);
-		else result.accept(((Result<R>) this).result);
+	default Command<R> whenR(Consumer<R> action){
+		if(this instanceof Result) action.accept(((Result<R>) this).result);
+		return this;
+	}
+	
+	default Command<R> whenE(Consumer<String> action){
+		if(this instanceof Error) action.accept(((Error<R>) this).error);
+		return this;
 	}
 	
 	default Command<R> when(Predicate<R> predicate, Supplier<String> error){
@@ -46,9 +43,10 @@ public interface Command<R> {
 		return when(predicate.negate(), error);
 	}
 	
-	default Command<R> match(@SuppressWarnings("unchecked") Matcher<R>... cases){
-		if(this instanceof Error || cases.length == 1) return this;
-		for(Matcher<R> cs : cases) if(cs.match(((Result<R>) this).result)) return cs.evalExpr();
+	@SuppressWarnings("unchecked")
+	default Command<?> match(LabeledStatement<R, ?>... statements){
+		if(this instanceof Error) return this;
+		for(LabeledStatement<R, ?> statement : statements) if(statement.matcher.match(((Result<R>) this).result)) return statement.evaluate();
 		return this;
 	}
 	

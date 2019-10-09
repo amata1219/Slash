@@ -2,7 +2,7 @@ package amata1219.slash;
 
 public class Interval<N extends Number & Comparable<N>> {
 	
-	private final EndPoint<N> lower, upper;
+	public final EndPoint<N> lower, upper;
 	
 	public static <N extends Number & Comparable<N>> EndPoint<N> OpenEnd(N x){
 		return new EndPoint<>(x, false);
@@ -12,12 +12,12 @@ public class Interval<N extends Number & Comparable<N>> {
 		return new EndPoint<>(x, true);
 	}
 	
-	public static <N extends Number & Comparable<N>> Interval<N> Range(N lower, N upper){
-		return Range(ClosedEnd(lower), OpenEnd(upper));
+	public static <N extends Number & Comparable<N>> Interval<N> Range(N startInclusive, N endExclusive){
+		return Range(ClosedEnd(startInclusive), OpenEnd(endExclusive));
 	}
 	
-	public static <N extends Number & Comparable<N>> Interval<N> RangeClosed(N lower, N upper){
-		return Range(ClosedEnd(lower), ClosedEnd(upper));
+	public static <N extends Number & Comparable<N>> Interval<N> RangeClosed(N startInclusive, N endInclusive){
+		return Range(ClosedEnd(startInclusive), ClosedEnd(endInclusive));
 	}
 	
 	public static <N extends Number & Comparable<N>> Interval<N> Range(EndPoint<N> lower, EndPoint<N> upper){
@@ -25,16 +25,16 @@ public class Interval<N extends Number & Comparable<N>> {
 		return new Interval<>(lower, upper);
 	}
 	
-	private Interval(EndPoint<N> lower, EndPoint<N> upper){
-		this.lower = lower;
-		this.upper = upper;
+	private Interval(EndPoint<N> startInclusive, EndPoint<N> endExclusive){
+		this.lower = startInclusive;
+		this.upper = endExclusive;
 	}
 	
 	public boolean contains(N x){
 		return lower.lesser(x) && upper.greater(x);
 	}
 	
-	private static class EndPoint<T extends Number & Comparable<T>> {
+	public static class EndPoint<T extends Number & Comparable<T>> {
 		
 		public final T x;
 		public final boolean containsEqualElement;

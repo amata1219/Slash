@@ -12,16 +12,16 @@ public abstract class Matcher<T> {
 		return new Literal<>(literals);
 	}
 	
-	public static <T> Matcher<T> Case(Predicate<T> predicate){
+	public static <T> Matcher<T> Case(Class<T> type, Predicate<T> predicate){
 		return new Condition<>(predicate);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> Matcher<T> Else(Supplier<Command<T>> expression){
-		return (Matcher<T>) DEFAULT;
+	public static <T, R> LabeledStatement<T, R> Else(Supplier<Command<R>> expression){
+		return (LabeledStatement<T, R>) DEFAULT.label(expression);
 	}
 
-	public LabeledStatement<T> label(Supplier<Command<T>> expression){
+	public <R> LabeledStatement<T, R> label(Supplier<Command<R>> expression){
 		return new LabeledStatement<>(this, expression);
 	}
 	

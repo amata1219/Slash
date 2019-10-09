@@ -2,17 +2,17 @@ package amata1219.slash;
 
 import java.util.function.Supplier;
 
-public class LabeledStatement<T> {
+public class LabeledStatement<T, R> {
 	
 	public final Matcher<T> matcher;
-	private final Supplier<Command<T>> expression;
+	private final Supplier<Command<R>> expression;
 	
-	public LabeledStatement(Matcher<T> matcher, Supplier<Command<T>> expression){
+	public LabeledStatement(Matcher<T> matcher, Supplier<Command<R>> expression){
 		this.matcher = matcher;
 		this.expression = expression;
 	}
 	
-	public Command<T> evaluate(){
+	public Command<R> evaluate(){
 		return expression.get();
 	}
 
