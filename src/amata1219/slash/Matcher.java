@@ -12,14 +12,9 @@ public abstract class Matcher<T> {
 		return new Literal<>(literals);
 	}
 	
-	public static <T> Matcher<T> Case(Class<T> type, Predicate<T> predicate){
-		return new Condition<>(predicate);
+	public static <T, R> LabeledStatement<T, R> Case(Predicate<T> predicate, Supplier<Command<R>> expression){
+		return new LabeledStatement<>(new Condition<>(predicate), expression);
 	}
-	
-	public static <T> Matcher<T> Case(Predicate<T> predicate){
-		return new Condition<>(predicate);
-	}
-	
 	
 	@SuppressWarnings("unchecked")
 	public static <T, R> LabeledStatement<T, R> Else(Supplier<Command<R>> expression){

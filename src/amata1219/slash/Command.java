@@ -16,6 +16,10 @@ public interface Command<R> {
 		return new Error<>(error);
 	}
 	
+	public static <R> Error<R> Error(ErrorMessage error){
+		return Error(error.get());
+	}
+	
 	@SuppressWarnings("unchecked")
 	default <T> Command<T> flatBind(Function<R, Command<T>> mapper){
 		return this instanceof Error ? (Command<T>) this : mapper.apply(((Result<R>) this).result);

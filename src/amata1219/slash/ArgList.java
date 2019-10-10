@@ -32,8 +32,12 @@ public class ArgList {
 		}
 		return result != null ? Result(result) : Error(error.get());
 	}
-
+	
 	public Command<String> next(Supplier<String> error){
+		return next(Function.identity(), error);
+	}
+	
+	public Command<String> next(ErrorMessage error){
 		return next(Function.identity(), error);
 	}
 
