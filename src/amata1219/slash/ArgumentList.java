@@ -1,7 +1,5 @@
 package amata1219.slash;
 
-import static amata1219.slash.dsl.CommandMonad.*;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -34,7 +32,7 @@ public class ArgumentList {
 		}catch(Exception e){
 			
 		}
-		return result != null ? Result(result) : Error(error.get());
+		return CommandMonad.unit(result, error);
 	}
 	
 	public CommandMonad<String> next(Supplier<String> error){
@@ -81,7 +79,7 @@ public class ArgumentList {
 	}
 	
 	public CommandMonad<String> join(int count,  Supplier<String> error){
-		return range(count, ranged -> ranged.isEmpty() ? Error(error.get()) : Result(Joiner.on(' ').join(ranged)));
+		return range(count, ranged -> ranged.isEmpty() ? CommandMonad.Error(error.get()) : CommandMonad.Result(Joiner.on(' ').join(ranged)));
 	}
 	
 	public ArgumentList skip(int count){

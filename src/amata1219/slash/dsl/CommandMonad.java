@@ -9,16 +9,32 @@ import amata1219.slash.dsl.component.LabeledStatement;
 
 public interface CommandMonad<R> {
 	
-	public static <R> Result<R> Result(R result){
+	static <R> CommandMonad<R> unit(R result, String error){
+		return result != null ? Result(result) : Error(error);
+	}
+	
+	static <R> CommandMonad<R> unit(R result, Supplier<String> error){
+		return unit(result, error);
+	}
+	
+	static <R> Result<R> Result(R result){
 		return new Result<>(result);
 	}
 	
-	public static <R> Error<R> Error(String error){
+	static <R> Error<R> Error(String error){
 		return new Error<>(error);
 	}
 	
-	public static <R> Error<R> Error(Message error){
+	static <R> Error<R> Error(Supplier<String> error){
 		return Error(error.get());
+	}
+	
+	static <R> Error<R> Message(String message){
+		return new Error<>(message);
+	}
+	
+	static <R> Error<R> Message(Supplier<String> message){
+		return Message(message.get());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -33,6 +49,10 @@ public interface CommandMonad<R> {
 	default CommandMonad<R> whenR(Consumer<R> action){
 		if(this instanceof Result) action.accept(((Result<R>) this).result);
 		return this;
+	}
+	
+	default CommandMonad<R> whenR(Function<R, Supplier<String>> action){
+		return this instanceof Error ? this :  Error(action.apply(((Result<R>) this).result));
 	}
 	
 	default CommandMonad<R> whenE(Consumer<String> action){
@@ -67,7 +87,7 @@ public interface CommandMonad<R> {
 	
 	class Error<R> implements CommandMonad<R> {
 		
-		public final String error;
+		final String error;
 		
 		private Error(String error){
 			this.error = error;
@@ -77,7 +97,7 @@ public interface CommandMonad<R> {
 	
 	class Result<R> implements CommandMonad<R> {
 		
-		public final R result;
+		final R result;
 		
 		private Result(R result){
 			this.result = result;
