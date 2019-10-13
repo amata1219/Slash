@@ -5,7 +5,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import amata1219.slash.dsl.component.ErrorMessage;
 import amata1219.slash.dsl.component.LabeledStatement;
 
 public interface CommandMonad<R> {
@@ -18,7 +17,7 @@ public interface CommandMonad<R> {
 		return new Error<>(error);
 	}
 	
-	public static <R> Error<R> Error(ErrorMessage error){
+	public static <R> Error<R> Error(Message error){
 		return Error(error.get());
 	}
 	

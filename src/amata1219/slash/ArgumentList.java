@@ -1,35 +1,36 @@
 package amata1219.slash;
 
-import static amata1219.slash.Interval.*;
 import static amata1219.slash.dsl.CommandMonad.*;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.google.common.base.Joiner;
 
 import amata1219.slash.dsl.CommandMonad;
-import amata1219.slash.dsl.component.ErrorMessage;
 
-public class ArgList {
+public class ArgumentList {
 
-	private final String[] args;
-	private int index;
+	private final Queue<String> remainings;
 
-	public ArgList(String[] args){
-		this.args = args;
+	public ArgumentList(String[] args){
+		remainings = new LinkedList<>(Arrays.asList(args));
 	}
 
 	public int size(){
-		return args.length;
+		return remainings.size();
 	}
 	
 	public <R> CommandMonad<R> next(Function<String, R> converter, Supplier<String> error){
 		R result = null;
 		try{
-			result = converter.apply(index < args.length ? args[index++] : null);
+			result = converter.apply(remainings.poll());
 		}catch(Exception e){
 			
 		}
@@ -37,10 +38,6 @@ public class ArgList {
 	}
 	
 	public CommandMonad<String> next(Supplier<String> error){
-		return next(Function.identity(), error);
-	}
-	
-	public CommandMonad<String> next(ErrorMessage error){
 		return next(Function.identity(), error);
 	}
 
@@ -76,21 +73,19 @@ public class ArgList {
 		return next(Double::valueOf, error);
 	}
 	
-	public <T> CommandMonad<T> range(Interval<Integer> range, Function<Collection<String>, CommandMonad<T>> action){
-		String[] ranged = Arrays.copyOfRange(args, range.lower.x, index = range.upper.x);
-		return action.apply(Arrays.asList(ranged));
+	public <T> CommandMonad<T> range(int count, Function<Collection<String>, CommandMonad<T>> action){
+		Collection<String> ranged = IntStream.range(0, count)
+				.mapToObj(i -> remainings.poll())
+				.collect(Collectors.toList());
+		return action.apply(ranged);
 	}
 	
-	public <T> CommandMonad<T> range(int endInclusive, Function<Collection<String>, CommandMonad<T>> action){
-		return range(Range(index + 1, endInclusive), action);
+	public CommandMonad<String> join(int count,  Supplier<String> error){
+		return range(count, ranged -> ranged.isEmpty() ? Error(error.get()) : Result(Joiner.on(' ').join(ranged)));
 	}
 	
-	public CommandMonad<String> join(int endInclusive, Supplier<String> error){
-		return range(endInclusive, ranged -> ranged.isEmpty() ? Error(error.get()) : Result(Joiner.on(' ').join(ranged)));
-	}
-	
-	public ArgList skip(int count){
-		index += count;
+	public ArgumentList skip(int count){
+		for(int i = Math.min(count, size()); i > 0; i--) remainings.remove();
 		return this;
 	}
 
