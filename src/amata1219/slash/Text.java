@@ -1,28 +1,22 @@
 package amata1219.slash;
 
+import java.util.Objects;
 import java.util.function.Consumer;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class Text {
 
 	private static final String COLORS = "0123456789AaBbCcDdEeFfKkLlMmNnOoRr";
 	private static final String NULL = String.valueOf(Character.MIN_VALUE);
-
+	
 	public static Text of(String text){
 		return new Text(text);
 	}
-	private String text;
-
-	public Text(String text){
-		this.text = text;
+	
+	public static Text empty(){
+		return of("");
 	}
-
-	public Text color(){
+	
+	public static String color(String text){
 		char[] characters = text.toCharArray();
 
 		for(int i = 0; i < characters.length - 1; i++){
@@ -43,30 +37,20 @@ public class Text {
 			}
 		}
 
-		text = new String(characters).replace(NULL, "");
-		return this;
+		return new String(characters).replace(NULL, "");
 	}
-
-	public Text format(Object... objects){
-		text = String.format(text, objects);
-		return this;
+	private String text;
+	
+	private Text(String text){
+		this.text = color(Objects.requireNonNull(text));
 	}
-
+	
+	public String apply(Object... objects){
+		return String.format(text, objects);
+	}
+	
 	public void accept(Consumer<String> action){
 		action.accept(text);
-	}
-
-	public void sendTo(CommandSender to){
-		accept(to::sendMessage);
-	}
-
-	public void actionbar(Player to){
-		accept(text -> to.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(text)));
-	}
-
-	@Override
-	public String toString(){
-		return text;
 	}
 
 }

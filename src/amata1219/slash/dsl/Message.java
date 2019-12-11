@@ -10,8 +10,8 @@ public interface Message extends Supplier<String> {
 		return message();
 	}
 	
-	default Supplier<String> format(Object... objects){
-		return () -> Text.of(get()).format(objects).color().toString();
+	default Supplier<String> apply(Object... objects){
+		return () -> Text.of(get()).apply(objects);
 	}
 	
 	String message();
