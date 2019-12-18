@@ -11,7 +11,7 @@ public interface Message extends Supplier<String> {
 	}
 	
 	default Supplier<String> apply(Object... objects){
-		return () -> Text.of(get()).apply(objects);
+		return () -> Text.of(get()).format(objects);
 	}
 	
 	String message();

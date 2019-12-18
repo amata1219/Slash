@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 
 import com.google.common.base.Joiner;
 
-import amata1219.slash.dsl.CommandMonad;
+import amata1219.slash.monad.Either;
 
 public class ArgumentList {
 
@@ -25,61 +25,59 @@ public class ArgumentList {
 		return remainings.size();
 	}
 	
-	public <R> CommandMonad<R> next(Function<String, R> converter, Supplier<String> error){
-		R result = null;
+	public <R> Either<String, R> next(Function<String, R> converter, Supplier<String> error){
 		try{
-			result = converter.apply(remainings.poll());
+			return Either.Success(converter.apply(remainings.poll()));
 		}catch(Exception e){
-			
+			return Either.Failure(error.get());
 		}
-		return CommandMonad.unit(result, error);
 	}
 	
-	public CommandMonad<String> next(Supplier<String> error){
+	public Either<String, String> next(Supplier<String> error){
 		return next(Function.identity(), error);
 	}
 
-	public CommandMonad<Boolean> nextBool(Supplier<String> error){
+	public Either<String, Boolean> nextBool(Supplier<String> error){
 		return next(Boolean::valueOf, error);
 	}
 
-	public CommandMonad<Character> nextChar(Supplier<String> error){
+	public Either<String, Character> nextChar(Supplier<String> error){
 		return next(s -> s.length() == 1 ? s.charAt(0) : null, error);
 	}
 
-	public CommandMonad<Byte> nextByte(Supplier<String> error){
+	public Either<String, Byte> nextByte(Supplier<String> error){
 		return next(Byte::valueOf, error);
 	}
 
-	public CommandMonad<Short> nextShort(Supplier<String> error){
+	public Either<String, Short> nextShort(Supplier<String> error){
 		return next(Short::valueOf, error);
 	}
 
-	public CommandMonad<Integer> nextInt(Supplier<String> error){
+	public Either<String, Integer> nextInt(Supplier<String> error){
 		return next(Integer::valueOf, error);
 	}
 
-	public CommandMonad<Long> nextLong(Supplier<String> error){
+	public Either<String, Long> nextLong(Supplier<String> error){
 		return next(Long::valueOf, error);
 	}
 
-	public CommandMonad<Float> nextFloat(Supplier<String> error){
+	public Either<String, Float> nextFloat(Supplier<String> error){
 		return next(Float::valueOf, error);
 	}
 
-	public CommandMonad<Double> nextDouble(Supplier<String> error){
+	public Either<String, Double> nextDouble(Supplier<String> error){
 		return next(Double::valueOf, error);
 	}
-	
-	public <T> CommandMonad<T> range(int count, Function<Collection<String>, CommandMonad<T>> action){
+
+	public <T> Either<String, T> range(int count, Function<Collection<String>, Either<String, T>> action){
 		Collection<String> ranged = IntStream.range(0, count)
 				.mapToObj(i -> remainings.poll())
 				.collect(Collectors.toList());
 		return action.apply(ranged);
 	}
 	
-	public CommandMonad<String> join(int count,  Supplier<String> error){
-		return range(count, ranged -> ranged.isEmpty() ? CommandMonad.Error(error.get()) : CommandMonad.Result(Joiner.on(' ').join(ranged)));
+	public Either<String, String> join(int count,  Supplier<String> error){
+		return range(count, ranged -> ranged.isEmpty() ? Either.Failure(error.get()) : Either.Success(Joiner.on(' ').join(ranged)));
 	}
 	
 	public ArgumentList skip(int count){
