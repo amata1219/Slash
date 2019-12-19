@@ -27,6 +27,11 @@ public abstract class Matcher<T> {
 		return new LabeledStatement<>(this, expression);
 	}
 	
+	public <F, S> LabeledStatement<T, F, S> then(Runnable action){
+		action.run();
+		return label(() -> null);
+	}
+	
 	public abstract boolean match(T value);
 	
 	private static class Literal<T> extends Matcher<T> {

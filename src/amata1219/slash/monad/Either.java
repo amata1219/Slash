@@ -13,6 +13,10 @@ public interface Either<F, S> {
 		return Success(value);
 	}
 	
+	public static Either<String, ?> error(String error){
+		return new Failure<>(error);
+	}
+	
 	public static <F, S> Either<F, S> Success(S value){
 		return new Success<>(value);
 	}
@@ -60,8 +64,10 @@ public interface Either<F, S> {
 
 		@Override
 		public Either<F, ?> match(@SuppressWarnings("unchecked") LabeledStatement<S, F, ?>... statements) {
-			for(LabeledStatement<S, F, ?> statement : statements) if(statement.matcher.match(value))
-				return statement.evaluate();
+			for(LabeledStatement<S, F, ?> statement : statements) if(statement.matcher.match(value)){
+				Either<F, ?> result = statement.evaluate();
+				return result != null ? result : this;
+			}
 			return this;
 		}
 
