@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 public interface MessageEffect {
 	
 	default void sendTo(CommandSender sender){
-		sender.sendMessage(message());
+		Text.of(message()).sendTo(sender);
 	}
 	
 	String message();

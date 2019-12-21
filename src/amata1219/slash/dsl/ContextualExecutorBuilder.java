@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import amata1219.slash.dsl.Either.Failure;
 import amata1219.slash.dsl.Either.Success;
 
 public class ContextualExecutorBuilder<S extends CommandSender> {
@@ -43,7 +44,10 @@ public class ContextualExecutorBuilder<S extends CommandSender> {
 		BiFunction<S, RawCommandContext, Maybe<PartiallyParsedArguments>> combinedParser = (sender, context) -> {
 			Either<MessageEffect, PartiallyParsedArguments> result = parse(new LinkedList<>(Arrays.asList(parsers)), new LinkedList<>(context.arguments), new ArrayList<>(), onMissingArguments);
 			if(result instanceof Success) return Maybe.Some(((Success<MessageEffect, PartiallyParsedArguments>) result).value);
-			else return Maybe.None();
+			else {
+				((Failure<MessageEffect, PartiallyParsedArguments>) result).error.sendTo(sender);
+				return Maybe.None();
+			}
 		};
 		return new ContextualExecutorBuilder<>(senderTypeValidation, combinedParser, contextualExecution);
 	}
@@ -100,8 +104,8 @@ public class ContextualExecutorBuilder<S extends CommandSender> {
 		);
 	}
 	
-	public ContextualExecutorBuilder<Player> playerCommandBuilder(){
-		return null;
+	public static ContextualExecutorBuilder<Player> playerCommandBuilder(){
+		return beginConfiguration().refineSenderWithError("&c-このコマンドはゲーム内から実行して下さい。");
 	}
 	
 }
