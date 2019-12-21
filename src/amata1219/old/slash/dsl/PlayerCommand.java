@@ -1,10 +1,10 @@
-package amata1219.slash.dsl;
+package amata1219.old.slash.dsl;
 
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import amata1219.slash.Text;
+import amata1219.old.slash.Text;
 
 public interface PlayerCommand extends CommandExecutor {
 	

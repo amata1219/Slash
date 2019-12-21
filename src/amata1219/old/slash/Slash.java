@@ -1,4 +1,4 @@
-package amata1219.slash;
+package amata1219.old.slash;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

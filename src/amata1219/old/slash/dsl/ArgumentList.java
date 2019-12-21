@@ -1,4 +1,4 @@
-package amata1219.slash.dsl;
+package amata1219.old.slash.dsl;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 
 import com.google.common.base.Joiner;
 
-import amata1219.slash.monad.Either;
+import amata1219.old.slash.monad.Either;
 
 public class ArgumentList<F> {
 

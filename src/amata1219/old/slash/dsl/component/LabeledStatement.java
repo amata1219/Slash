@@ -1,8 +1,8 @@
-package amata1219.slash.dsl.component;
+package amata1219.old.slash.dsl.component;
 
 import java.util.function.Supplier;
 
-import amata1219.slash.monad.Either;
+import amata1219.old.slash.monad.Either;
 
 public class LabeledStatement<T, F, S> {
 	

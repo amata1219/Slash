@@ -1,11 +1,11 @@
-package amata1219.slash.monad;
+package amata1219.old.slash.monad;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import amata1219.slash.dsl.component.LabeledStatement;
+import amata1219.old.slash.dsl.component.LabeledStatement;
 
 public interface Either<F, S> {
 	
