@@ -10,6 +10,10 @@ public interface Parser<T>{
 		return x -> Success(x);
 	}
 	
+	static Parser<Boolean> bool(Message error){
+		return convert(error, Boolean::valueOf);
+	}
+	
 	static Parser<Integer> i32(Message error){
 		return convert(error, Integer::valueOf);
 	}
