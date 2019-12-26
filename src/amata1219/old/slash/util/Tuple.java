@@ -1,4 +1,4 @@
-package amata1219.slash.util;
+package amata1219.old.slash.util;
 
 public class Tuple<F, S> {
 	

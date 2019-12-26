@@ -1,4 +1,4 @@
-package amata1219.slash.util;
+package amata1219.old.slash.util;
 
 import java.util.Objects;
 import java.util.function.Consumer;

@@ -1,10 +1,10 @@
-package amata1219.slash.executor;
+package amata1219.old.slash.executor;
 
 import org.bukkit.command.CommandSender;
 
-import amata1219.slash.ContextualExecutor;
-import amata1219.slash.contexts.RawCommandContext;
-import amata1219.slash.effect.TargetedEffect;
+import amata1219.old.slash.ContextualExecutor;
+import amata1219.old.slash.contexts.RawCommandContext;
+import amata1219.old.slash.effect.TargetedEffect;
 
 public class EchoExecutor implements ContextualExecutor {
 	

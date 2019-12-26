@@ -1,8 +1,8 @@
-package amata1219.slash.effect;
+package amata1219.old.slash.effect;
 
 import org.bukkit.command.CommandSender;
 
-import amata1219.slash.util.Text;
+import amata1219.old.slash.util.Text;
 
 public interface MessageEffect {
 	

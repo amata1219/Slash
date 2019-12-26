@@ -1,13 +1,13 @@
-package amata1219.slash.executor;
+package amata1219.old.slash.executor;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import amata1219.slash.ContextualExecutor;
-import amata1219.slash.contexts.RawCommandContext;
-import amata1219.slash.monad.Maybe;
-import amata1219.slash.util.Tuple;
+import amata1219.old.slash.ContextualExecutor;
+import amata1219.old.slash.contexts.RawCommandContext;
+import amata1219.old.slash.monad.Maybe;
+import amata1219.old.slash.util.Tuple;
 
 public class BranchedExecutor implements ContextualExecutor {
 	

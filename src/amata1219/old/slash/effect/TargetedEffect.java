@@ -1,4 +1,4 @@
-package amata1219.slash.effect;
+package amata1219.old.slash.effect;
 
 public interface TargetedEffect<T> {
 	

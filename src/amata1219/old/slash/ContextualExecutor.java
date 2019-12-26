@@ -1,4 +1,4 @@
-package amata1219.slash;
+package amata1219.old.slash;
 
 import java.util.Arrays;
 
@@ -6,8 +6,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import amata1219.slash.contexts.ExecutedCommand;
-import amata1219.slash.contexts.RawCommandContext;
+import amata1219.old.slash.contexts.ExecutedCommand;
+import amata1219.old.slash.contexts.RawCommandContext;
 
 public interface ContextualExecutor extends CommandExecutor {
 	
