@@ -6,11 +6,11 @@ import java.util.function.Function;
 
 public interface Either<F, S> {
 	
-	public static <F, S> Either<F, S> success(S value){
+	static <F, S> Either<F, S> success(S value){
 		return new Success<>(value);
 	}
 	
-	public static <F, S> Either<F, S> failure(F error){
+	static <F, S> Either<F, S> failure(F error){
 		return new Failure<>(error);
 	}
 	
