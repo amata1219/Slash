@@ -1,6 +1,8 @@
-package amata1219.slash;
+package amata1219.slash.parser;
 
 import java.util.function.Predicate;
+
+import amata1219.slash.monad.Either;
 
 public interface Parser<T> {
 	

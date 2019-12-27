@@ -1,6 +1,6 @@
-package amata1219.slash;
+package amata1219.slash.parser;
 
-import static amata1219.slash.Either.*;
+import static amata1219.slash.monad.Either.*;
 
 import java.util.function.Function;
 

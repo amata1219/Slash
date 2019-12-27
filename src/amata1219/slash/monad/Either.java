@@ -1,4 +1,4 @@
-package amata1219.slash;
+package amata1219.slash.monad;
 
 import java.util.Objects;
 import java.util.function.Consumer;

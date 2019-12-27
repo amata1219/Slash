@@ -1,4 +1,4 @@
-package amata1219.slash;
+package amata1219.slash.parser;
 
 public class Interval<N extends Number & Comparable<N>> {
 	
