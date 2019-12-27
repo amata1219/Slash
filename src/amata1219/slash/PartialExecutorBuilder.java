@@ -15,42 +15,21 @@ import com.google.common.collect.Lists;
 import amata1219.slash.monad.Either;
 import static amata1219.slash.monad.Either.*;
 
-import amata1219.slash.parser.Interval;
-import amata1219.slash.parser.Interval.End;
 import amata1219.slash.parser.Parser;
-import amata1219.slash.parser.Parsers;
 
 public class PartialExecutorBuilder<S extends CommandSender> {
-	
-	static{
-		builderForPlayer()
-		.parsers(
-			Text.of("&c-/teleport [player] [world] [x] [y] [z]"),
-			Parsers.onlinePlayer,
-			Parsers.world,
-			Parsers.i32,
-			Parsers.limited(Parsers.i32, Interval.of(End.closed(0), End.open(256)), Text.of("&c-Y座標は0～255の整数値で入力して下さい。")),
-			Parsers.i32
-		)
-		.execution((sender, parsed, unparsed) -> {
-			Player player = parsed.next();
-			World world = parsed.next();
-			int x = parsed.
-			return Text.of("&c-success");
-		});
-	}
 	
 	public static PartialExecutorBuilder<CommandSender> builder(){
 		return new PartialExecutorBuilder<>().castSender(null);
 	}
 	
-	public static PartialExecutorBuilder<Player> builderForPlayer(){
+	public static PartialExecutorBuilder<Player> playerCommandBuilder(){
 		return new PartialExecutorBuilder<Player>().castSender(Text.of("&c-このコマンドはゲーム内で実行して下さい。"));
 	}
 	
 	private BiConsumer<S, CharSequence> messenger = (sender, message) -> sender.sendMessage(message.toString());
 	private Function<CommandSender, Either<CharSequence, S>> senderCaster;
-	private BiFunction<S, List<String>, Either<CharSequence, PartiallyParsedArguments>> parser = (x, y) -> success(new PartiallyParsedArguments(Lists.newArrayList(), Lists.newLinkedList()));
+	private BiFunction<S, Queue<String>, Either<CharSequence, PartiallyParsedArguments>> parser = (x, y) -> success(new PartiallyParsedArguments(Lists.newArrayList(), Lists.newLinkedList()));
 	private TriFunction<S, ParsedArguments, Queue<String>, CharSequence> execution;
 	
 	public PartialExecutorBuilder<S> messenger(BiConsumer<S, CharSequence> messenger){
@@ -71,12 +50,12 @@ public class PartialExecutorBuilder<S extends CommandSender> {
 		return this;
 	}
 	
-	public PartialExecutorBuilder<S> parsers(CharSequence onMissingArguments, Parser<?>... parsers){
-		BiFunction<S, List<String>, Either<CharSequence, PartiallyParsedArguments>> combinedParser = (sender, arguments) -> parse(
+	public PartialExecutorBuilder<S> parsers(CharSequence argumentsMissingError, Parser<?>... parsers){
+		BiFunction<S, Queue<String>, Either<CharSequence, PartiallyParsedArguments>> combinedParser = (sender, arguments) -> parse(
 			Lists.newLinkedList(Arrays.asList(parsers)),
-			Lists.newLinkedList(arguments),
+			arguments,
 			Lists.newArrayList(),
-			onMissingArguments
+			argumentsMissingError
 		);
 		this.parser = combinedParser;
 		return this;
@@ -86,15 +65,15 @@ public class PartialExecutorBuilder<S extends CommandSender> {
 		Queue<Parser<?>> remainingParsers,
 		Queue<String> remainingArguments,
 		List<Object> parsedArgumentAccumulator,
-		CharSequence onMissingArguments
+		CharSequence argumentsMissingError
 	){
 		if(remainingParsers.isEmpty()) return success(new PartiallyParsedArguments(parsedArgumentAccumulator, remainingArguments));
-		else if(remainingArguments.isEmpty()) return failure(onMissingArguments);
+		else if(remainingArguments.isEmpty()) return failure(argumentsMissingError);
 		Parser<?> nextParser = remainingParsers.poll();
 		String nextArgument = remainingArguments.poll();
 		return nextParser.parse(nextArgument).flatMap(parsedArgument -> {
 			parsedArgumentAccumulator.add(parsedArgument);
-			return parse(remainingParsers, remainingArguments, parsedArgumentAccumulator, onMissingArguments);
+			return parse(remainingParsers, remainingArguments, parsedArgumentAccumulator, argumentsMissingError);
 		});
 	}
 	
