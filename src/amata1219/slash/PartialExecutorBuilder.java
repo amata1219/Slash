@@ -18,17 +18,7 @@ public class PartialExecutorBuilder<S extends CommandSender> {
 	
 	private Function<CommandSender, Either<CharSequence, S>> senderCaster;
 	private BiFunction<S, List<String>, Either<CharSequence, PartiallyParsedArguments>> parser;
-	public final TriFunction<S, ParsedArguments, Queue<String>, CharSequence> partialExecution;
-	
-	public PartialExecutorBuilder(
-		Function<CommandSender, Either<CharSequence, S>> senderCaster,
-		BiFunction<S, List<String>, Either<CharSequence, PartiallyParsedArguments>> parser,
-		TriFunction<S, ParsedArguments, Queue<String>, CharSequence> partialExecution
-	){
-		this.senderCaster = senderCaster;
-		this.parser = parser;
-		this.partialExecution = partialExecution;
-	}
+	private TriFunction<S, ParsedArguments, Queue<String>, CharSequence> execution;
 	
 	@SuppressWarnings("unchecked")
 	public PartialExecutorBuilder<S> castSender(CharSequence error){
@@ -68,6 +58,15 @@ public class PartialExecutorBuilder<S extends CommandSender> {
 			parsedArgumentAccumulator.add(parsedArgument);
 			return parse(remainingParsers, remainingArguments, parsedArgumentAccumulator, onMissingArguments);
 		});
+	}
+	
+	public PartialExecutorBuilder<S> execution(TriFunction<S, ParsedArguments, Queue<String>, CharSequence> execution){
+		this.execution = execution;
+		return this;
+	}
+	
+	public PartialExecutor<S> build(){
+		return null;
 	}
 	
 }
